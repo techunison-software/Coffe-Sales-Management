@@ -55,8 +55,12 @@ class Login:
     
     def callInventoryModule():
         InventoryModule(self.user)
-       
 
+    def callPurchaseModule():
+        PurchaseModule(self.user) 
+
+    def callSalesModule():
+        SalesModule(self.user) 
 
 login_check = Login()        
 login_check.initialCall()
