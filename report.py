@@ -1,12 +1,9 @@
 import pandas as pd
 import pdfkit as pdf
 import datetime
-import pdfkit
 import os
 import glob
 import csv
-import mysql.connector
-import MySQLdb
 import sqlalchemy as sql
 import SQLAlchemyCon as conn
 from xlsxwriter.workbook import Workbook
@@ -15,10 +12,8 @@ sql_engine = conn.getConnection()
 #Main Class
 class Report:
 
-	def initCall(self):
-		roleId = int(input("Enter the roleId: "))
-		deptId = int(input(" Enter the deptId: "))
-		self.getIDDetails(roleId,deptId)
+	def initCall(self,user_bean):
+		self.getIDDetails(user_bean["role_id"][0],user_bean["department_id"][0])
 		#print("User role not defined")
 
 	#def getUserID(rId,deptId):
@@ -276,8 +271,6 @@ class Report:
 		df.to_html(html_file)
 		pdf.from_file(html_file, pdf_file)
 
-rp = Report()
-rp.initCall()
 
 
 
