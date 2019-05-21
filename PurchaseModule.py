@@ -200,7 +200,7 @@ class PurchaseModule:
                         Currentdate=pd.to_datetime('now')
                         
                         try:                                
-                            Po_Request_Insert="INSERT INTO po_purchase(created_by,updated_by,order_no,total_amount,Payment_type_id,created_on,updated_on,po_request_id,vendors_item_id)VALUES(1, NULL,NULL, %s,%s, %s,%s,%s,%s)"
+                            Po_Request_Insert="INSERT INTO po_purchase(created_by,updated_by,order_no,total_amount,Payment_type_id,created_on,updated_on,po_request_id,vendors_item_id,Purchase_Status)VALUES(1, NULL,NULL, %s,%s, %s,%s,%s,%s,1)"
                             vals = (Totalamt,Payment,Currentdate,Currentdate,PORequestId,Vendors_item_id)   
                             sql_engine.execute(Po_Request_Insert, vals)
                             print(Po_Request_Insert)                                   
@@ -255,7 +255,7 @@ class PurchaseModule:
                                 Vendor_val = int(Vendors_Id)                        
                                 print("Input number value is: ", Vendor_val)
 
-                                PurchaseId_Check='SELECT * FROM Po_Purchase WHERE po_purchase_Id=''"'+str(Vendor_val)+'"'
+                                PurchaseId_Check='SELECT * FROM Po_Purchase WHERE Purchase_Status=1 AND po_purchase_Id=''"'+str(Vendor_val)+'"'
                                 PurchaseId_result=pd.read_sql_query(PurchaseId_Check, sql_engine) 
                                 print(PurchaseId_result)
                                 df = pd.DataFrame(PurchaseId_result, columns = ['po_purchase_Id','po_request_id'])
@@ -331,42 +331,102 @@ class PurchaseModule:
                                                             except:
                                                                 print('Failed to update Inventory Table...!')
 
-
-
                                 else:
                                     print('Enter The Correct Purchase Request From The Above List.')
                                     h=1                   
 
                         except:
-                            print('Check')        
+                            print('Enter The Correct Purchase ID From The List TO Edit...')        
                             i = 3
                             return
 
 
                                                        
                     
-            """def DeletePurchase(self):
-                Vendors_Id=input('Enter The Purchase ID You Want To Edit : ')
-                if Vendors_Id in '':
+            def DeletePurchase(self):
+                PurchaseDelMsg="Success. A record has been deleted."
+                Purchases_Id=input('Enter The Purchase ID You Want To Edit : ')    
+
+                #q=1
+                #while q==1:
+                if Purchases_Id in '':
                     print('The Purchase ID is blank. So enter a value.')
-                    i=3
-                elif Vendors_Id not in '' and Vendors_Id.isdigit():
+                        #q=1
+                elif Purchases_Id not in '' and Purchases_Id.isdigit():
                     try:
-                        h=1
-                        while h==1:
-                            Vendor_val = int(Vendors_Id)                        
-                            print("Input number value is: ", Vendor_val)
-                            PurchaseId_Check='SELECT * FROM Po_Purchase WHERE po_purchase_Id=''"'+str(Vendor_val)+'"'
-                            PurchaseId_result=pd.read_sql_query(PurchaseId_Check, sql_engine) 
-                            print(PurchaseId_result)
-                            df = pd.DataFrame(PurchaseId_result, columns = ['po_purchase_Id','po_request_id'])
-                            POPurchaseId=int(df['po_purchase_Id'][0])                                
-                            print('RequestID')
-                            RequestID=int(df['po_request_id'])
-                            print('RequestID',RequestID)
-                            if Vendor_val == POPurchaseId:
-                                print('The Purchase Request Id Is Present In The Purchase Request. So continue.')
-                                return"""
+                        #h=1
+                        #while h==1:
+                        Purchase_val = int(Purchases_Id)                        
+                        print("Input number value is: ", Purchase_val)
+                        PurchaseId_Check='SELECT * FROM Po_Purchase WHERE Purchase_Status =1 AND po_purchase_Id=''"'+str(Purchase_val)+'"'
+                        PurchaseId_result=pd.read_sql_query(PurchaseId_Check, sql_engine) 
+                        print(PurchaseId_result)
+                        df = pd.DataFrame(PurchaseId_result, columns = ['po_purchase_Id','po_request_id'])
+                        POPurchaseId=int(df['po_purchase_Id'][0])                                                                
+                        RequestID=int(df['po_request_id'])
+                                                                    
+                        
+                                # Obtaining the Inventory ID and Po Request Qty from Purchase Request Table.
+
+                        PurchaseRequest='SELECT * FROM po_request WHERE po_request_id=''"'+str(RequestID)+'"'
+                        PurchaseRequest_result=pd.read_sql_query(PurchaseRequest, sql_engine)
+                        print(PurchaseRequest_result)
+
+                        df=pd.DataFrame(PurchaseRequest_result,columns=['inv_item_id','po_request_quantity'])
+                        InvId=int(df['inv_item_id'])
+
+                        RequestQty=int(df['po_request_quantity'])                        
+
+                        # Minus the Quantity from Inventory Table With Inventory ID
+                        print('Minus the Quantity from Inventory Table With Inventory ID')
+                        InvQty='SELECT item_quantity from inv_item WHERE inv_item_id=''"'+str(InvId)+'"'
+                        InvQty_Result=pd.read_sql_query(InvQty,sql_engine)
+                        
+                        df=pd.DataFrame(InvQty_Result,columns=['item_quantity'])
+                        InvQuantity=int(df['item_quantity'])
+                        print('InventoryQuantity->',InvQuantity)
+
+                        Quantity=InvQuantity-RequestQty                       
+
+                        # try:
+                        #     QuantityUpdate='Update inv_item SET item_quantity=%s WHERE inv_item_id=''"'+str(InvId)+'"'
+                        #     values=(Quantity)
+                        #     sql_engine.execute(QuantityUpdate,values)
+                        #     print('Quantity Updation',QuantityUpdate)
+
+                        # except:
+                        #     print('Quantity Updation Failed...')    
+
+                        if Purchase_val == POPurchaseId:
+                            try:
+                                zero=0
+                                status=str(zero)
+                                print('eeeeeee',Purchase_val)
+                                print('The Purchase Request Id to delete Is Present. So Delete.')
+                                PurchaseTblUpd_Query='UPDATE po_purchase SET Purchase_Status = %s WHERE po_purchase_Id = ''"'+str(Purchase_val)+'"'
+                                values=(status)
+                                sql_engine.execute(PurchaseTblUpd_Query,values)
+
+                                QuantityUpdate='Update inv_item SET item_quantity=%s WHERE inv_item_id=''"'+str(InvId)+'"'
+                                values=(Quantity)
+                                sql_engine.execute(QuantityUpdate,values)
+                                
+                                print("Success. The Purchase ID has been deleted.",str(Purchase_val))
+
+                            except:
+                                print('Error in Deleting Purchase...')
+                        else:
+                            print('Failed in Deleting the Purchase ID : ',str(Purchase_val))                                    
+                    except:
+                        print('Enter Valid Purchase ID from the list...')
+                            #h=1
+                else:
+                    print('Check The Format of Your Purchase ID input...')
+                    #q=1
+                    return PurchaseDelMsg
+
+
+
 
 
             def initCall(self,user):
@@ -453,9 +513,9 @@ class PurchaseModule:
                                     PurchaseModule().EditPurchase()
 
 
-                                elif response in'c':
+                                elif response in'z':
                                     print('You Have Selected To Delete A Purchase ')    
-                                    PurchaseModule.DeletePurchase()
+                                    PurchaseModule().DeletePurchase()
 
 
                         else:
@@ -469,5 +529,6 @@ class PurchaseModule:
                     if answer in 'Q' or answer in 'q':
                         print('Exiting...')
                         exit
-    
-              
+
+#PurchaseModule().Statement() 
+
