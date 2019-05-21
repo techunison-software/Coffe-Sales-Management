@@ -345,7 +345,7 @@ class PurchaseModule:
 
                                                        
                     
-            def DeletePurchase(self):
+            """def DeletePurchase(self):
                 Vendors_Id=input('Enter The Purchase ID You Want To Edit : ')
                 if Vendors_Id in '':
                     print('The Purchase ID is blank. So enter a value.')
@@ -366,7 +366,7 @@ class PurchaseModule:
                             print('RequestID',RequestID)
                             if Vendor_val == POPurchaseId:
                                 print('The Purchase Request Id Is Present In The Purchase Request. So continue.')
-                                return
+                                return"""
 
 
             def initCall(self,user):
