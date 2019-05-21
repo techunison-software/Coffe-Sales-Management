@@ -369,7 +369,9 @@ class PurchaseModule:
                                 return
 
 
-
+            def initCall(self,user):
+                self.user=user
+                self.Statement()
 
             def Statement(self):
                 print("Statement")
@@ -468,5 +470,4 @@ class PurchaseModule:
                         print('Exiting...')
                         exit
     
-        
-PurchaseModule().Statement()          
+              
