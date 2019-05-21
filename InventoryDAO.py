@@ -2,7 +2,8 @@ import mysql.connector
 import pandas 
 from tabulate import tabulate
 from texttable import Texttable
-connection = mysql.connector.connect(host='192.168.1.128',port='3307',database='coffee',user='application',password='abc123!@#')
+connection = mysql.connector.connect(host='1.22.137.204',port='3307',database='coffee',user='application',password='abc123!@#')
+
 class InventoryDAO:    
     def __allItemList__(self):
         try:

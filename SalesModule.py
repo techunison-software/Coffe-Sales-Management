@@ -2,14 +2,17 @@ import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 
-conn = mysql.connector.connect(host='192.168.1.128',port='3307',database='coffee',user='application',password='abc123!@#')
+conn = mysql.connector.connect(host='1.22.137.204',port='3307',database='coffee',user='application',password='abc123!@#')
 mycursor = conn.cursor()
 
 global soitemlst
 soitemlst = []
+global user_detail
+user_detail=[]
 
 class SalesModule:
-    def initCall(self):
+    def initCall(self,user_bean):
+        user_detail=user_bean
         self.dup_crud = input("1.Create Sales Order \t 2.Update Sales Order \t 3.Delete Sales Order 4.View Sales Orders 0.Exit \n Press number 1 or 2 or 3 or 4 or 0:\t")
         self.crud = self.checkpositiveinteger(self.dup_crud)
         if self.crud == 1:
@@ -123,9 +126,9 @@ class CreateSO:
                 self.getcartitems()
 
             elif ifs == 0:
-                SalesModule().initCall()
+                print("user_detail :",user_detail )
+                SalesModule().initCall(user_detail)
                 
-
             #else:
                 #cond = 0
     
@@ -139,8 +142,8 @@ class CreateSO:
     def getcartitems(self):
         print("Items in your cart!!!")
         df= pd.DataFrame(soitemlst)
-        df.columns = ['ItemId','Qty.','UnitPrice','Discount','TotalPrice']
-        print(df[['ItemId','Qty.','UnitPrice','Discount','TotalPrice']])
+        #df.columns = ['ItemId','Qty.','UnitPrice','Discount','TotalPrice']
+        print(df[['inv_item_id','quantity','unit_price','discount','total_price']])
 
     def gettprice(self,iid,disc,uprice,qty):
         itemid = iid
@@ -261,8 +264,6 @@ class ViewSO:
     def initCall(self):
         print("List of Sales orders",end="")
 
-sm = SalesModule()
-sm.initCall()
 
 
        
