@@ -2,6 +2,7 @@ import pandas as pd
 import sqlalchemy as sql
 import SQLAlchemyCon as conn
 from tabulate import tabulate
+from passlib.hash import sha256_crypt
 
 import UserModule as userMod
 import PurchaseModule as purchaseMod
@@ -21,7 +22,7 @@ class LoginInitial:
     def authenticate(self):
         user=self.getUserDetails()
         if not user.empty:
-            if self.user_name == user["user_name"][0] and self.password == user["password"][0]:
+            if self.user_name == user["user_name"][0] and sha256_crypt.verify(self.password , user["password"][0]):
                 print("\n\tSuccessfully LogedIn!")
                 Login().initialCall(user)
             else:
