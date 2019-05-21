@@ -2,6 +2,7 @@ import pandas as pd
 import Login as login
 import SQLAlchemyCon as conn
 from tabulate import tabulate
+from passlib.hash import sha256_crypt
 
 sql_engine=conn.getConnection()
 class UserModule:
@@ -69,7 +70,8 @@ class UserModule:
         newUser["name"]=self.sanitised_input("Enter the Name  : ", str,len_=(3,100))
         newUser["email_id"]=self.checkEmailValid()     
         newUser["user_name"]=self.checkUserNameValid()
-        newUser["password"]=self.sanitised_input("Enter Password  : ", str,len_=(6,50))
+        password=self.sanitised_input("Enter Password  : ", str,len_=(6,50))
+        newUser["password"]=sha256_crypt.encrypt(password)
         print("\nLIST OF DEPARTMENT :\n",self.getDepartmrnt())
         newUser["department_id"]=self.sanitised_input("\nEnter  Department Id : ", int, 1, 4)
         print("\nLIST OF ROLE :\n",self.getRole())
