@@ -17,8 +17,11 @@ class UserModule:
 
     def menuList(self):
         print("=======================================================")
-        if str(self.user["role"][0]).casefold()==str("Admin").casefold() or str(self.user["department_name"][0]).casefold()==str("HR").casefold():
+        if str(self.user["role"][0]).casefold()==str("Admin").casefold() :
             print(tabulate([["1", "User List View"],["2","Create User"],["3","Edit User"],["4","Delete User"],["5","Back to main Menu"]], headers=['Id', 'Menu']))    
+            self.menuValue(self.checkIntValue(input("=======================================================\nEnter the ID :")))
+        elif str(self.user["department_name"][0]).casefold()==str("HR").casefold():
+            print(tabulate([["1", "User List View"],["2","Create User"],["3","Edit User"],["4","Delete User"],["5","Logout"]], headers=['Id', 'Menu']))    
             self.menuValue(self.checkIntValue(input("=======================================================\nEnter the ID :")))
         elif str(self.user["role"][0]).casefold()==str("Manager").casefold() :
             print(tabulate([["1", "User List View"],["2","Back to main Menu"]], headers=['Id', 'Menu']))   
@@ -43,8 +46,11 @@ class UserModule:
             self.editOrdeleteUser(1)
         elif inp_value==4:
             self.editOrdeleteUser(2)
-        elif inp_value==5:
+        elif inp_value==5 and (self.user["role"][0]).casefold()==str("Admin").casefold():
             self.backMainMenu()
+        elif inp_value==5 and not (self.user["role"][0]).casefold()==str("Admin").casefold():
+            print("\n\tLoggedOut Successfully!")
+            self.sesInvalid()
         else:
             print("\n\tPlease enter a valid input!")
             self.menuList()
