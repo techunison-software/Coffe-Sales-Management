@@ -77,7 +77,8 @@ class SalesModule:
             self.pint  = input("Not a number,Please enter number!!! \t")
             self.checkpositiveinteger(self.pint)
         return int(self.pint)
-    
+
+
 class CreateSO:
 
     def initCall(self,user):
@@ -105,7 +106,6 @@ class CreateSO:
             df.columns = ['ItemId','ItemName','Qty.','MRP','Discount']
             print(df)
             self.createsalesorder(lst,0,user,soitemlst)
-
 
     def additem(self,lst,soitemlst):
         itemlist = lst
@@ -249,7 +249,6 @@ class CreateSO:
             soitemlst = [ x for x in soitemlst if x['inv_item_id'] != itemid]
         
         return soitemlst 
-
 
     def getcartitems(self,soitemlst):
         if len(soitemlst) == 0:
@@ -396,8 +395,6 @@ class CreateSO:
             print("Item ID is Wrong!!!, ",end="")
             return self.deletesoitem(soitemlst)
         
-
-
 class UpdateSO:
     def initCall(self,user):
         self.listofso(user)
@@ -435,15 +432,183 @@ class UpdateSO:
                 if so_detailedid1 == 0:
                     return SalesModule().initCall(user)
                 else:
-                    self.detailedso(so_detailedid1,user)
+                    return self.detailedso(so_detailedid1,user)
 
         except mysql.connector.Error as error:
             conn.rollback()
             print("Failed Selecting record from so_header table {}".format(error))
-            SalesModule.initCall(user)
+            return SalesModule.initCall(user)
         finally:
             if conn.is_connected() :
                 cursor.close()
+
+    def detailedso(self,so_id,user):
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT sohd.inv_item_id,ii.item_name,sohd.quantity,sohd.discount,sohd.unit_price,ii.item_quantity,sohd.total_price,u.user_name,sohd.created_on FROM so_header_details sohd join users u on sohd.created_by = u.user_id join inv_item ii on ii.inv_item_id = sohd.inv_item_id  where sohd.delete_status = 1 and sohd.so_header_id = "+str(so_id))
+            itemlst = cursor.fetchall()
+            conn.commit()
+            if len(itemlst)==0:
+                print("This sales order has no item!!!")
+                self.listofso(user)
+            else:
+                df= pd.DataFrame(itemlst)
+                df.columns = ['ItemId','ItemName','Qty.','Discount(%)','UnitPrice','InventoryQty','TotalPrice','SalesPerson','CreatedDate']
+                print(df)
+                return self.selectitem(so_id,user,itemlst)
+
+        except mysql.connector.Error as error:
+            conn.rollback()
+            print("Failed Selecting record from so_header_details table {}".format(error))
+            return self.listofso(user)
+        
+        finally:
+            if conn.is_connected() :
+                cursor.close()
+
+    def updateitem(self,itemdetails,so_id,user,itemlst):
+        try:
+            cursor = conn.cursor()
+            sql_update_query = 'update so_header_details set quantity = '+ str(itemdetails[3])+' ,discount = '+ str(itemdetails[4])+' ,total_price = '+ str(itemdetails[5]) + ' ,updated_by ='+ str(user['user_id'][0])  + ' ,updated_on = now() where inv_item_id = '+str(itemdetails[0])+' and so_header_id = ' + str(so_id)
+            result = cursor.execute(sql_update_query)
+            conn.commit()
+        except mysql.connector.Error as error:
+            conn.rollback()
+            print("Failed updating record into so_header_details table {}".format(error))
+            return detailedso(so_id,user)
+        finally:
+            if conn.is_connected() :
+                cursor.close()
+
+        try:
+            cursor = conn.cursor()
+            sql_update_query2 = 'update inv_item set item_quantity = '+  str(itemdetails[6]) + ' ,updated_by ='+ str(user['user_id'][0])  + ' ,updated_on = now() where inv_item_id ='+str(itemdetails[0])
+            result = cursor.execute(sql_update_query2)
+            conn.commit()
+        except mysql.connector.Error as error:
+            conn.rollback()
+            print("Failed updating record into inv_item table {}".format(error))
+            return detailedso(so_id,user)
+        finally:
+            if conn.is_connected() :
+                cursor.close()
+
+        try:
+
+            cursor = conn.cursor()
+            sql_update_query2 = 'update so_header set total_amount = total_amount + ('+  str(itemdetails[7]) +') ,updated_by ='+ str(user['user_id'][0])  + ' ,updated_on = now() where so_header_id ='+str(so_id)
+            result = cursor.execute(sql_update_query2)
+            conn.commit()
+        except mysql.connector.Error as error:
+            conn.rollback()
+            print("Failed updating record into so_header table {}".format(error))
+            return detailedso(so_id,user)
+        finally:
+            if conn.is_connected() :
+                cursor.close()
+                return self.listofso(user)
+
+    def selectitem(self,so_id,user,itemlst):
+        itemid = self.getitemid(itemlst)
+        itemname = self.getitemname(itemlst,itemid)
+        unitprice = self.getuprice(itemlst,itemid)
+        quantity = self.getquantity(itemlst,itemid)
+        discount = self.getdiscount(itemlst,itemid)
+        totalprice = self.gettprice(itemid,discount,unitprice,quantity)
+        print("ItemId: "+str(itemid)+",ItemName: "+ itemname+",Qty: "+str(quantity)+",Discount: "+str(discount)+",TotalPrice: "+str(totalprice))
+        
+        for row in itemlst:
+            if itemid == row[0]:
+                invqty = row[5] + row[2] - quantity
+                tamount = totalprice - row[6] 
+                
+        itemdetails = [itemid,itemname,unitprice,quantity,discount,totalprice,invqty,tamount]
+        return self.updateitem(itemdetails,so_id,user,itemlst)
+        
+    def getitemid(self,itemlst):
+        dup_itemid = input("Enter ItemId to update:\t")
+        itemid1 = self.checkpositiveint(dup_itemid)
+        itemid = self.checkitemid(itemlst,itemid1)
+        return itemid
+
+    def getitemname(self,itemlst,itemid):
+        for row in itemlst:
+            if itemid == row[0]:
+                return row[1]
+    
+    def getuprice(self,itemlst,itemid):
+        for row in itemlst:
+            if itemid == row[0]:
+                return row[4]
+
+    def gettprice(self,iid,disc,uprice,qty):
+        itemid = iid
+        discount = disc
+        unitprice = uprice
+        quantity = qty
+        totalprice = unitprice*quantity
+
+        if discount == 0:
+            return totalprice
+
+        else:
+            discount = discount/100
+            dup_totalprice = totalprice * discount
+            totalprice = totalprice - dup_totalprice
+            return totalprice
+
+    def getquantity(self,itemlst,itemid):
+        dup_quantity = input("Enter quantity to update:")
+        quantity1 = self.checkpositiveint(dup_quantity)
+        quantity = self.checkquantity(itemlst,itemid,quantity1)
+        return quantity
+
+    def getdiscount(self,itemlst,itemid):
+        for row in itemlst:
+            if itemid == row[0]:
+                if row[3] == 0 or row[3] == None:
+                    print("Your item has no discount!!!\t")
+                    return 0
+        
+        dup_disc = input("Enter Discount:\t")
+        disc1 = self.checkpositiveint(dup_disc)
+        disc = self.checkdiscount(itemlst,itemid,disc1)
+        return disc
+
+    def checkitemid(self,itemlst,itemid):
+        increment = 0
+
+        for row in itemlst:
+            if itemid == row[0]:
+                return itemid
+            else:
+                increment += 1
+
+        if len(itemlst) == increment:
+            print("Item ID is Wrong!!!, ",end="")
+            return self.getitemid(itemlst)
+
+    def checkquantity(self,itemlst,itemid,qty):
+        for row in itemlst:
+            if itemid == row[0]:
+                if qty <= row[2] :
+                    return qty
+                elif qty > row[2]:
+                    qty1 = qty-row[2]
+                    if row[5] < qty1:
+                        print("Quantity is Greater than available quantity!!!, ",end="")
+                        return self.getquantity(itemlst,itemid)
+                    else:
+                        return qty
+
+    def checkdiscount(self,itemlst,itemid,disc):
+        for row in itemlst:
+            if itemid == row[0]:
+                if disc <= row[3] :
+                    return disc
+                else:
+                    print("Discount is Greater than given discount !!!,",end="")
+                    return self.getdiscount(itemlst,itemid)
 
 
 class DeleteSO:
@@ -630,8 +795,8 @@ class ViewSO:
 
 
 #user1 = {'user_id':{0:1,"type":"int"},'user_name':{0:"admin1","type":"string"},'role_id':{0:1,"type":"int"},'role_name':{0:"administrator","type":"string"}}
-#user2 = [{'user_id':{0:2,"type":"int"},'user_name':{0:"manager1","type":"string"}},'role_id':{0:2,"type":"int"},'role_name':{0:"manager","type":"string"}]
-#user3 = [{'user_id':{0:3,"type":"int"},'user_name':{0:"user1","type":"string"}},'role_id':{0:3,"type":"int"},'role_name':{0:"user","type":"string"}]
+#user2 = {'user_id':{0:2,"type":"int"},'user_name':{0:"manager1","type":"string"},'role_id':{0:2,"type":"int"},'role_name':{0:"manager","type":"string"}}
+#user3 = {'user_id':{0:3,"type":"int"},'user_name':{0:"user1","type":"string"},'role_id':{0:3,"type":"int"},'role_name':{0:"user","type":"string"}}
 
 #sm = SalesModule()
 #sm.initCall(user1)
