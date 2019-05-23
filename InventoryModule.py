@@ -5,16 +5,17 @@ import Validation as valid
 import InventoryDAO as dao
 from tabulate import tabulate
 from texttable import Texttable
-#import Login as login
+
+import Login as login
 from mysql.connector import Error
-connection = mysql.connector.connect(host='192.168.1.128',port='3307',database='coffee',user='application',password='abc123!@#')
-user_bean=""
+connection = mysql.connector.connect(host='1.22.137.204',port='3307',database='coffee',user='application',password='abc123!@#')
+
 # Class Name
 class InventoryModule: 
     # Inventory menu start
-    def __init__(user_bean):
-        # if not user_bean:
-      #   login.LoginInitial().initialCall() 
+    def initCall(self,user_bean):
+        if not user_bean:
+           login.LoginInitial().initialCall() 
         menu.InventoryModuleMenu().__mainMuen__() 
         id=valid.Validataion().__inputIdValidataion__(7)               
         InventoryModule.__menuMethod__(id,user_bean)
@@ -29,6 +30,7 @@ class InventoryModule:
                 dao.InventoryDAO().__isCount0ItemList__()
         elif int(id)==2:
             print("---------------------- New Item  ---------------------")
+<<<<<<< HEAD
             dao.InventoryDAO().__addItem__(user_bean)
         elif int(id)==3:
             print("---------------------- Update Item -------------------")
@@ -73,9 +75,9 @@ class InventoryModule:
          
 
                     
+=======
+            dao.InventoryDAO().__addItem__(id,user_bean)
+        InventoryModule().initCall(user_bean)            
+>>>>>>> 9ea10e3a29e6ec8ef095e19a740a146c1946e156
         
    
-
-
-
-print ("Inventory.__init__:", InventoryModule.__init__(user_bean))

@@ -1,0 +1,13 @@
+glob3
+mysql-connector
+mysqlclient
+pandas
+passlib
+pdfkit
+numpy
+python-dateutil
+SQLAlchemy
+tabulate
+texttable
+workbook
+XlsxWriter
