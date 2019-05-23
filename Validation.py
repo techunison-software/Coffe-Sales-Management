@@ -1,3 +1,4 @@
+import InventoryDAO as dao
 from array import array
 class Validataion:
     def __representsInt__(id):
@@ -54,9 +55,10 @@ class Validataion:
                 break
                 
         return item_id
+
     def __addPORequestValidation__(self):
         po =[]
-        i = 0
+        i = 0        
         while i == 0:  
             po.insert(0,input("Enter Item id : "))  
             status=Validataion.__representsInt__(po[0])  
@@ -75,4 +77,19 @@ class Validataion:
             else:
                 print('Enter valid quantity' )            
         return po
+
+    def __enterUpdatePORequest__(self):
+        poRequestId=""
+        i=0
+        while i==0:            
+            poRequestId=input("Enter PO Request Id :")          
+            status=Validataion.__representsInt__(poRequestId)  
+            if status==True:                       
+                if not poRequestId:
+                    print("Error : Enter valid PO Request Id  ")                              
+                else:
+                    break
+        return poRequestId 
+                
+
 

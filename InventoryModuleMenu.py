@@ -12,11 +12,11 @@ class InventoryModuleMenu:
 
   def __poMenuList__(self):
     print('=======================================================')
-    print(tabulate([['1','PO Request List'],['2','New PO Request'],['3','Update PO Request'],['4','Delete PO Request'],['5','Report']], headers=['ID','MENU']))      
+    print(tabulate([['1','PO Request List'],['2','New PO Request'],['3','Update PO Request'],['4','Delete PO Request'],['5','Report'],['6','Exit']], headers=['ID','MENU']))      
   
   def __poRequestListMenu__(self):
     print("=======================================================")
-    print(tabulate([['1','All PO Request List'],['2','Purchased PO Request List'],['3','Pending PO Request List']],headers=['ID','MENU']))
+    print(tabulate([['1','All PO Request List'],['2','Purchased PO Request List'],['3','Pending PO Request List'],['4','Exit']],headers=['ID','MENU']))
 
   
 
