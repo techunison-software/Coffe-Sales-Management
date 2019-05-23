@@ -15,12 +15,12 @@ class SalesModule:
         self.roleid = user['role_id'][0]
         
         if self.roleid == 1 or self.roleid == 2:
-            self.dup_crud = input("1.Create Sales Order \t 2.Update Sales Order \t 3.Delete Sales Order 4.View Sales Orders 0.GoBack \n Enter number 1 or 2 or 3 or 4 or 0:\t")
+            self.dup_crud = input("1.Create Sales Order \t 2.Update Sales Order \t 3.Delete Sales Order \t 4.View Sales Orders \t 5.OverAll Itemwise Sales 0.GoBack \n Enter number 1 or 2 or 3 or 4 or 5 or 0:\t")
             self.crud = self.checkpositiveinteger(self.dup_crud)
             self.conditioncheck(self.roleid,user)
 
         elif self.roleid == 3:
-            self.dup_crud = input("1.Create Sales Order \t 2.Update Sales Order \t 3.View Sales Orders 0.GoBack \n Enter number 1 or 2 or 3 or 0:\t")
+            self.dup_crud = input("1.Create Sales Order \t 2.Update Sales Order \t 3.View Sales Orders \t 4.Overall Itemwise Sales  0.GoBack \n Enter number 1 or 2 or 3 or 4 or 0:\t")
             self.crud = self.checkpositiveinteger(self.dup_crud)
             self.conditioncheck(self.roleid,user)
 
@@ -42,6 +42,11 @@ class SalesModule:
             elif self.crud==4:
                 vso = ViewSO()
                 vso.initCall(user)
+            
+            elif self.crud  == 5:
+                iws = ItemwiseSales()
+                iws.initCall(user)
+
             elif self.crud ==0:
                 return
 
@@ -61,6 +66,11 @@ class SalesModule:
             elif self.crud==3:
                 vso = ViewSO()
                 vso.initCall(user)
+
+            elif self.crud == 4:
+                iws = ItemwiseSales()
+                iws.initCall(user)
+
             elif self.crud ==0:
                 return
 
@@ -202,7 +212,7 @@ class CreateSO:
             self.getcartitems(soitemlst)
 
         while True:
-            dup_ifs = input("\n 1.Add Item \t 2.Delete existing Item \t 3.Proceed for payment 4.View Items in SO \t 0.Exit \n Enter number 1 or 2 or 3 or 4 or 0:\t")
+            dup_ifs = input("\n 1.Add Item \t 2.Delete existing Item \t 3.Proceed for payment 4.View Items in SO \t 0.Go Back \n Enter number 1 or 2 or 3 or 4 or 0:\t")
             ifs = self.checkpositiveint(dup_ifs)
 
             if ifs == 1 :
@@ -427,7 +437,7 @@ class UpdateSO:
                 df= pd.DataFrame(lst)
                 df.columns = ['SO_Id','SalesPerson','PaymentType','TotalAmount','BillDate']
                 print(df)
-                dup_sodetailedid = input('Enter SO_Id to see the detailed view of sales Order or 0.Exit \t')
+                dup_sodetailedid = input('Enter SO_Id to see the detailed view of sales Order or 0.Go Back \t')
                 so_detailedid1 = self.checkpositiveint(dup_sodetailedid)
                 if so_detailedid1 == 0:
                     return SalesModule().initCall(user)
@@ -455,7 +465,14 @@ class UpdateSO:
                 df= pd.DataFrame(itemlst)
                 df.columns = ['ItemId','ItemName','Qty.','Discount(%)','UnitPrice','InventoryQty','TotalPrice','SalesPerson','CreatedDate']
                 print(df)
-                return self.selectitem(so_id,user,itemlst)
+                dup_yn = input("press 1 to continue or 0 to go back!!! ")
+                yn = self.checkpositiveint(dup_yn)
+                if yn == 0:
+                    return self.listofso(user)
+                elif yn == 1:
+                    return self.selectitem(so_id,user,itemlst)
+                else:
+                    return self.detailedso(so_id,user)
 
         except mysql.connector.Error as error:
             conn.rollback()
@@ -506,6 +523,7 @@ class UpdateSO:
         finally:
             if conn.is_connected() :
                 cursor.close()
+                print("Updated Successfully!!!")
                 return self.listofso(user)
 
     def selectitem(self,so_id,user,itemlst):
@@ -643,7 +661,7 @@ class DeleteSO:
                 df= pd.DataFrame(lst)
                 df.columns = ['SO_Id','SalesPerson','PaymentType','TotalAmount','BillDate']
                 print(df)
-                dup_sodetailedid = input('Enter SO_Id to delete the sales Order or 0.Exit: \t')
+                dup_sodetailedid = input('Enter SO_Id to delete the sales Order or 0.Go Back: \t')
                 so_detailedid1 = self.checkpositiveint(dup_sodetailedid)
                 if so_detailedid1 == 0:
                     SalesModule().initCall(user)
@@ -792,6 +810,35 @@ class ViewSO:
             if conn.is_connected() :
                 cursor.close()
 
+
+class ItemwiseSales:
+    def initCall(self,user):
+        self.listofso(user)
+    
+    def listofso(self,user):
+        try:
+            cursor = conn.cursor()
+            cursor.execute("select ii.inv_item_id,ii.item_name,sum(sohd.quantity) from so_header_details sohd join inv_item ii on ii.inv_item_id = sohd.inv_item_id group by ii.inv_item_id")
+            lst = cursor.fetchall()
+            conn.commit()
+            if len(lst)==0:
+                print("No Item has been sold!!!")
+                self.listofso(user)
+            else:
+                df= pd.DataFrame(lst)
+                df.columns = ['ItemId','ItemName','No.ofItemsSold']
+                print("Item Wise Sales")
+                print(df)
+                return SalesModule().initCall(user)
+
+        except mysql.connector.Error as error:
+            conn.rollback()
+            print("Failed Selecting record from so_header_details table {}".format(error))
+            self.listofso(user)
+        
+        finally:
+            if conn.is_connected() :
+                cursor.close()
 
 
 #user1 = {'user_id':{0:1,"type":"int"},'user_name':{0:"admin1","type":"string"},'role_id':{0:1,"type":"int"},'role_name':{0:"administrator","type":"string"}}
