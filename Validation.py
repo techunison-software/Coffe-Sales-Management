@@ -53,7 +53,6 @@ class Validataion:
                 print("Enter valid item Id")                           
             else:
                 break
-                
         return item_id
 
     def __addPORequestValidation__(self):

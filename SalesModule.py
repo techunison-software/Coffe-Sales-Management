@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 import pandas as pd
+import Login
 
 conn = mysql.connector.connect(host='1.22.137.204',port='3307',database='coffee',user='application',password='abc123!@#')
 
@@ -47,9 +48,9 @@ class SalesModule:
                 iws = ItemwiseSales()
                 iws.initCall(user)
 
-            elif self.crud ==0:
-                return
-
+            elif self.crud == 0:
+                loginModule = Login.Login()
+                loginModule.initialCall(user)
             else:
                 print("Please choose correct number!!!\n")
                 self.initCall(user)
@@ -70,13 +71,15 @@ class SalesModule:
             elif self.crud == 4:
                 iws = ItemwiseSales()
                 iws.initCall(user)
-
+            
             elif self.crud ==0:
-                return
-
+                loginModule = Login.Login()
+                loginModule.initialCall(user)
+            
             else:
                 print("Please choose correct number!!!\n")
                 self.initCall(user)
+        
         else:
             print("Role Id is undefined.Please contact admin!!!")
             return

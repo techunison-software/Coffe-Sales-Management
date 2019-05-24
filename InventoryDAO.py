@@ -5,6 +5,7 @@ import copy
 from tabulate import tabulate
 from texttable import Texttable
 connection = mysql.connector.connect(host='192.168.1.128',port='3307',database='coffee',user='application',password='abc123!@#')
+
 class InventoryDAO:    
     def __allItemList__(self,id):        
         try:            
@@ -22,12 +23,12 @@ class InventoryDAO:
                     itm1.insert(1,i[1])
                     itm1.insert(2,i[2])
                     itm.append(itm1)                                                           
-                print(tabulate(itm, headers=['Item Id','Item Name','Item Description']))            
+                print(tabulate(itm, headers=['Item Id','Item Name','Item Description']))  
         except mysql.connector.Error as error :
             print("Failed {} :".format(error))              
         finally:
             if(connection.is_connected()):
-                cursor.close()                                  
+                cursor.close()                          
                           
 
     def __isCount0ItemList__(self):        
@@ -45,21 +46,20 @@ class InventoryDAO:
                  
 
     def __addItem__(self,user_bean):        
-        item= vaild.Validataion().__addItemValidation__()       
         try:
-            insert_query = 'insert into inv_item(item_name,item_description,item_status,created_by,created_on) values("'+item[0]+'","'+item[1]+'",2,"'+user_bean[0]+'",now())'             
-            print(insert_query)
+            item= vaild.Validataion().__addItemValidation__()   
+            insert_query = 'insert into inv_item(item_name,item_description,item_status,created_by,created_on) values("'+str(item[0])+'","'+str(item[1])+'",2,"'+str(user_bean[0])+'",now())'             
             cursor = connection.cursor()
             result  = cursor.execute(insert_query)
             connection.commit()
-            print ("Record inserted successfully into inventory table")
-        except mysql.connector.Error as error :
-                connection.rollback() #rollback if any exception occured
-                print("Failed inserting record into inventory table {}".format(error))
+            print ("\nRecord inserted successfully into inventory table")
+        except Exception as error :
+            print("Failed inserting record into inventory table ",error)
+            connection.rollback() #rollback if any exception occured    
         finally:
-                #closing database connection.
-                if(connection.is_connected()):
-                    cursor.close()
+            #closing database connection.
+            if(connection.is_connected()):
+                cursor.close()
 
     def __selectUpdateItemId__(self) :
         item_id=""        
@@ -70,11 +70,10 @@ class InventoryDAO:
             try:
                 cursor = connection.cursor()
                 sql="select inv_item_id,item_name,item_description from inv_item where is_active=1 and inv_item_id="+str(item_id)
-                print(sql)
                 cursor.execute(sql)
                 lst=cursor.fetchall()
                 print(tabulate(lst, headers=['Item Id', 'Item Name','Item Description']))
-            except mysql.connector.Error as error:
+            except Exception as error:
                 print("Failed {}".format(error))  
             finally:
                 if(connection.is_connected()):
@@ -91,9 +90,9 @@ class InventoryDAO:
             insert_query=""
             if int(methodId)==1:
                 item=vaild.Validataion().__addItemValidation__() 
-                insert_query = 'update inv_item set item_name="'+item[0]+'" ,item_description="'+item[1]+'",updated_on=now(), updated_by="'+user_bean[0]+'" where inv_item_id="'+id+'"'   
+                insert_query = 'update inv_item set item_name="'+item[0]+'" ,item_description="'+item[1]+'",updated_on=now(), updated_by="'+str(user_bean[0])+'" where inv_item_id="'+str(id)+'"'   
             else :
-                insert_query = 'update inv_item set is_active=0 ,updated_on=now(),updated_by="'+user_bean[0]+'" where inv_item_id="'+id+'"' 
+                insert_query = 'update inv_item set is_active=0 ,updated_on=now(),updated_by="'+str(user_bean[0])+'" where inv_item_id="'+str(id)+'"' 
             
             cursor = connection.cursor()
             result  = cursor.execute(insert_query)
@@ -145,17 +144,15 @@ class InventoryDAO:
         while i==0:       
             po= vaild.Validataion().__addPORequestValidation__()       
             try:
-                insert_query = ' insert into po_request(inv_item_id,po_request_quantity,created_by,created_on) values("'+po[0]+'","'+po[1]+'","'+user_bean[0]+'",now())'             
-                
+                insert_query = ' insert into po_request(inv_item_id,po_request_quantity,created_by,created_on) values("'+po[0]+'","'+po[1]+'","'+str(user_bean[0])+'",now())'            
                 cursor = connection.cursor()
                 result  = cursor.execute(insert_query)
                 connection.commit()
                 print ("Record inserted successfully into PO table")
-                i==1
-            except mysql.connector.Error as error :
+                i=1
+            except Exception as error :
                     connection.rollback() #rollback if any exception occured
-                    print('Error :Enter correct item id')
-                    #print("Failed inserting record into PO table {}".format(error))
+                    print('Error :Enter correct item id',error)
             finally:
                     #closing database connection.
                     if(connection.is_connected()):
@@ -193,9 +190,9 @@ class InventoryDAO:
             query=""
             if methodId==1:
                 po= vaild.Validataion().__addPORequestValidation__() 
-                query = ' update po_request set inv_item_id="'+po[0]+'",po_request_quantity="'+po[1]+'" , updated_by="'+user_bean[0]+'",updated_on=now() where po_request_id='+str(id) 
+                query = ' update po_request set inv_item_id="'+po[0]+'",po_request_quantity="'+po[1]+'" , updated_by="'+str(user_bean[0])+'",updated_on=now() where po_request_id='+str(id) 
             else:
-                query = 'update po_request set updated_by="'+user_bean[0]+'",updated_on=now(),is_active=0 where po_request_id='+str(id) 
+                query = 'update po_request set updated_by="'+str(user_bean[0])+'",updated_on=now(),is_active=0 where po_request_id='+str(id) 
                       
             cursor = connection.cursor()
             result  = cursor.execute(query)

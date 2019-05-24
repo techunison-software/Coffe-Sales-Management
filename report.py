@@ -5,6 +5,7 @@ from datetime import datetime
 import os
 import glob
 import csv
+import Login 
 import sqlalchemy as sql
 import SQLAlchemyCon as conn
 from xlsxwriter.workbook import Workbook
@@ -22,22 +23,23 @@ class Report:
 	# def initCall(self):
 		# roleId = int(input("Enter the roleId: "))
 		# deptId = int(input(" Enter the deptId: "))
-		self.getIDDetails(user_bean["role_id"][0],user_bean["department_id"][0])
 		global userID
 		userID = user_bean["user_id"][0]
-		# print("user ID",userID)
+		print("user ID",userID)
 		global userRole 
 		# userRole = roleId
 		userRole = user_bean["role_id"][0]
-		# global userData
-		# userData = user_bean
+		global userData
+		userData = user_bean
+		self.getIDDetails(user_bean["role_id"][0],user_bean["department_id"][0])
+
 		# print("userRole------",userRole)
 		# self.getIDDetails(roleId,deptId)
 		#print("User role not defined")
 	def callLoginModule(self):
 		try:
 			loginModule = Login.Login()
-			loginModule.initialCall(self.userData)
+			loginModule.initialCall(userData)
 		except:
 			print("\n Function call error")
 			self.initCall(userData)

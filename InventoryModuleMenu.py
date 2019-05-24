@@ -4,7 +4,7 @@ from tabulate import tabulate
 class InventoryModuleMenu:
   def __mainMuen__(self):
     print("=======================================================")
-    print(tabulate([["1", "Item List"],["2","Add Item"],["3","Update Item"],["4","Delete Item"],['5','PO Request'],['6','Report'],["7","Logout"]], headers=['ID', 'MENU']))
+    print(tabulate([["1", "Item List"],["2","Add Item"],["3","Update Item"],["4","Delete Item"],['5','PO Request'],["6","Back to main menu"]], headers=['ID', 'MENU']))
     
   def __itemListMenu__(self):
     print("=======================================================")
