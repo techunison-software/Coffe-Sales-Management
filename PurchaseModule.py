@@ -34,52 +34,46 @@ class PurchaseModule:
                     b=1
                     while b==1:
                         VendorsPhone=input('Enter The Vendors contact :')
-                        b=1
+                        
 
                         if VendorsPhone in '' :
-                            c=1
-                            while c==1:
-                                print('The Vendor Contact is Empty. So please Enter.')
-
+                           print('The Vendor Contact is Empty. So please Enter.')
+                           b=1
+                                
                         elif VendorsPhone not in '' and VendorsPhone.isdigit():
                             d=1
                             while d==1:
                                 VendorsAddress=input('Enter The Vendors Address :')
-                                d=1
-
+                                
                                 if VendorsAddress in '':
-                                    e=1
-                                    while e==1:
-                                        print ('The Vendor Address is Empty. So Please Enter.')    
-                                        e=1
+                                    print ('The Vendor Address is Empty. So Please Enter.')                    
+                                    d=1                        
 
                                 elif VendorsAddress not in '':
                                     f=1
                                     while f==1:
                                         VendorsMailId=input('Enter The Vendors Mail Id :')  
-                                        f=1
-
-                                        if VendorsMailId in '' :
-                                            g=1
-                                            while g==1:
-                                                print('The Vendor Mail Id is Empty. So Please Enter it.')
-                                                g=1
-
-                                        # else:
-                                        #     print('Inputs must not be blank...')
-                                        #     a=1
+                                                                            
+                                        if VendorsMailId in '' :                                            
+                                            print('The Vendor Mail Id is Empty. So Please Enter it.')            
+                                            f=1
+                                                                                    
                                         elif VendorsMailId not in '':
-                                            if VendorsName not in '' and VendorsPhone not in '' and VendorsAddress not in '' and VendorsMailId not in '':
-                                                try:
-                                                    sql = "INSERT INTO vendors(Vendors_Name,Vendors_Phone,Vendors_Address,Vendors_Mail_Id,Is_Active)VALUES(%s, %s,%s, %s,1)"
-                                                    val = (VendorsName,VendorsPhone,VendorsAddress,VendorsMailId)
-                                                    sql_engine.execute(sql, val)
-                                                    print("Success. A record has been inserted.")
-                                                except :
-                                                    print("Failed inserting record into python_users table ")
+                                            #if VendorsName not in '' and VendorsPhone not in '' and VendorsAddress not in '' and VendorsMailId not in '':
+                                            try:
+                                                sql = "INSERT INTO vendors(Vendors_Name,Vendors_Phone,Vendors_Address,Vendors_Mail_Id,Is_Active)VALUES(%s, %s,%s, %s,1)"
+                                                val = (VendorsName,VendorsPhone,VendorsAddress,VendorsMailId)
+                                                sql_engine.execute(sql, val)
+                                                print("Success. A record has been inserted.")
+                                                PurchaseModule().Statement()
+                                            except :
+                                                print("Failed inserting record into python_users table ")
 
-                                            else :
-                                                print('')
+                                        else :
+                                            print('')
+
+                                else:
+                                    print('')
 
         except:
             print('Inputs must not be blank...')
@@ -128,30 +122,31 @@ class PurchaseModule:
                                         a=1
 
                                     elif VendorsAddress not in '':
-                                        VendorsPhone=input('Enter The Contact Of The Vendor that You want to Edit :')
-
-                                        if VendorsPhone in '':
-                                            b=1
-                                            while b==1:
+                                        b=1
+                                        while b==1:
+                                            VendorsPhone=input('Enter The Contact Of The Vendor that You want to Edit :')
+                                                                                    
+                                            if VendorsPhone in '':
                                                 print('The Vendor Phone is blank. So Enter a Value')    
                                                 b=1
 
-                                        elif VendorsPhone not in '' and VendorsPhone.isdigit():
-                                            VendorsMailId=input('Enter The MailId of The Contact That You want to Update :')
+                                            elif VendorsPhone not in '' and VendorsPhone.isdigit():
+                                                VendorsMailId=input('Enter The MailId of The Contact That You want to Update :')
+                                                if VendorsName not in '' and VendorsPhone not in '' and VendorsAddress not in '' and VendorsMailId not in '':
+                                                    try:
+                                                        Vendor_Update_Query= 'UPDATE vendors SET Vendors_Name = %s, Vendors_Phone=%s, Vendors_Address=%s,Vendors_Mail_Id=%s WHERE Vendors_Id = ''"'+VendorId_string+'"'
+                                                        values = (VendorsName,VendorsPhone,VendorsAddress,VendorsMailId)
+                                                        sql_engine.execute(Vendor_Update_Query, values)
+                                                        print("Success. A record has been updated.")
+                                                        PurchaseModule().Statement()
+                                                    except:
+                                                        print('Failed Updating record into Vendors table...')
+                                                else:
+                                                    print('')
 
-                                            if VendorsName not in '' and VendorsPhone not in '' and VendorsAddress not in '' and VendorsMailId not in '':
-                                                try:
-                                                    Vendor_Update_Query= 'UPDATE vendors SET Vendors_Name = %s, Vendors_Phone=%s, Vendors_Address=%s,Vendors_Mail_Id=%s WHERE Vendors_Id = ''"'+VendorId_string+'"'
-                                                    values = (VendorsName,VendorsPhone,VendorsAddress,VendorsMailId)
-                                                    sql_engine.execute(Vendor_Update_Query, values)
-                                                    print("Success. A record has been updated.")
-
-                                                except:
-                                                    print('Failed Updating record into Vendors table...')
-
-                                        else:
-                                            print('Invalid Mail Input...')
-                                            b=1
+                                    else:
+                                        print('Invalid Mail Input...')
+                                        b=1
                     else:
                         print('Application Cannot Proceed further...')
                 else:
@@ -177,40 +172,37 @@ class PurchaseModule:
                                     
                     if VendorID is '':
                         print('Vendor ID cannot be empty...')
+                        a=1
+                        
                     elif VendorID not in '' and VendorID.isdigit():
                         CheckVendorExists='SELECT Vendors_Id FROM vendors WHERE Is_Active =1 and Vendors_Id=''"'+str(VendorID)+'"'
                         result=pd.read_sql_query(CheckVendorExists, sql_engine)
+                        print(result)
+                        #df = pd.DataFrame(result, columns = ['Vendors_Id'])
 
-                        df = pd.DataFrame(result, columns = ['Vendors_Id'])
-                        print(df['Vendors_Id'][0])
-                        POVendorsId=int(df['Vendors_Id'][0])
-                        print('aa',POVendorsId)         
-
-                        if len(df.index) =='[]':
-                            print('No such ID exists...')
-                            i=1
-                        # elif len(result) != '':
-                        elif len(df.index)!='[]':
-                            PORequestId=int(df['Vendors_Id'])
-                            print(PORequestId)
-
-                            try:
-                                #val = str(VendorID)
-                                if( VendorID.isdigit()):
-                                    s=1
-                                    while s==1:
-                                        print("User input is Number ")
-                                        Vendor_Delete_Query= 'UPDATE vendors SET Is_Active = %s WHERE Vendors_Id = ''"'+str(VendorID)+'"'
-                                        values = (VendorsActive)
-                                        sql_engine.execute(Vendor_Delete_Query, values)
-                                        print("Success. A record has been deleted.")
-
-                                else: 
-                                    print("User input is string ")
-                                    s=1
+                        #POVendorsId=int(df['Vendors_Id'][0])
+                        
+                        #if len(df.index) =='[]':
+                            #print('No such ID exists...')
+                            #i=1
+                        
+                        #elif len(df.index)!='[]':
+                            #PORequestId=int(df['Vendors_Id'])
+                            
+                        try:
+                            if( VendorID.isdigit()):                                    
+                                print("User input is Number ")
+                                Vendor_Delete_Query= 'UPDATE vendors SET Is_Active = %s WHERE Vendors_Id = ''"'+str(VendorID)+'"'
+                                values = (VendorsActive)
+                                sql_engine.execute(Vendor_Delete_Query, values)
+                                print("Success. A record has been deleted.")
+                                PurchaseModule().Statement()
+                            else: 
+                                print("User input is string ")
+                                #s=1
                                 
-                            except :
-                                print("Failed Deleting record into Vendors table... Check Your Input... ") 
+                        except :
+                            print("Failed Deleting record into Vendors table... Check Your Input... ") 
 
                     else:
                         print('Enter Valid Input...')
@@ -290,8 +282,8 @@ class PurchaseModule:
                                         po_request_quantity=(df['po_request_quantity'][0]) 
                                         #print(df['po_request_quantity'])    
 
-                                        #print('Check->',df['po_request_quantity'])                                                    
-                                        vendorsitemid_Query='SELECT Vendors_item_id FROM vendors_item WHERE inv_item_id='+str(inv_item_id)           #and vendors_id=''"'+str(Vendor_val)+'"'
+                                        print('CheckassSasAS->',inv_item_id)                                                    
+                                        vendorsitemid_Query='SELECT Vendors_item_id FROM vendors_item WHERE vendors_id=''"'+str(Vendor_val)+'"'             #inv_item_id='+str(inv_item_id)           #and vendors_id=''"'+str(Vendor_val)+'"'
                                         print(vendorsitemid_Query)
                                         getvendorsitemid=pd.read_sql_query(vendorsitemid_Query,sql_engine)
                             
@@ -323,7 +315,7 @@ class PurchaseModule:
                                             print(UpdateQty_Query)
                                             sql_engine.execute(UpdateQty_Query,values)
                                             print("Success. Purchase Quantity has been updated.")
-
+                                            
                                         except:
                                             print("Error while updating Purchase Quantity in Inventory.")
 
@@ -336,6 +328,7 @@ class PurchaseModule:
                                             values=(RequestStatus_str)
                                             sql_engine.execute(requestStatus,values)
                                             print('purchase Request Status Has been Updated...')
+                                            PurchaseModule().Statement()
 
                                         except:
                                             print('Error while updating the status...')    
@@ -442,6 +435,7 @@ class PurchaseModule:
                                                                                 values=(PurchaseItemMrpPrice,PurchaseItemQuantity,PurchaseMaxDiscount,PurchaseWeight)
                                                                                 sql_engine.execute(inv_Update_Query,values)
                                                                                 print("Success. Inventory has been updated.")
+                                                                                PurchaseModule().Statement()
 
                                                                             except:
                                                                                 print('Failed to update Inventory Table...!')
@@ -515,6 +509,7 @@ class PurchaseModule:
                             values=(Quantity)
                             sql_engine.execute(QuantityUpdate,values)
                             print("Success. The Purchase ID has been deleted :",str(Purchase_val))
+                            PurchaseModule().Statement()
 
                         except:
                             print('Error in Deleting Purchase...')
@@ -532,8 +527,8 @@ class PurchaseModule:
 
     def Statement(self):
         self.user=[{'role_id':1,'department_id':2}]
-        print(self.user)
-        print(self.user[0]["role_id"])
+        #print(self.user)
+        #print(self.user[0]["role_id"])
         try:
             answer = input('Please Select One Of The Values 1. Vendor 2. Purchase or type Q to quit:')
             i=0
@@ -617,5 +612,5 @@ class PurchaseModule:
             print('Check Your Input..!')           
             return
 
-#PurchaseModule().Statement() 
+PurchaseModule().Statement() 
 
