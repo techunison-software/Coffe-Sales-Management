@@ -46,39 +46,13 @@ class PurchaseModule:
                                 VendorsAddress=input('Enter The Vendors Address :')
                                 
                                 if VendorsAddress in '':
-<<<<<<< HEAD
-                                    print ('The Vendor Address is Empty. So Please Enter.')                                            
-=======
                                     print ('The Vendor Address is Empty. So Please Enter.')                    
                                     d=1                        
->>>>>>> e5d25a57c34145c2ee92596ddc2430cdcc4b6c77
 
                                 elif VendorsAddress not in '':
                                     f=1
                                     while f==1:
                                         VendorsMailId=input('Enter The Vendors Mail Id :')  
-<<<<<<< HEAD
-                                        f=1                                        
-                                        if VendorsMailId in '' :                                            
-                                            print('The Vendor Mail Id is Empty. So Please Enter it.')                                                
-
-                                        # else:
-                                        #     print('Inputs must not be blank...')
-                                        #     a=1
-                                        elif VendorsMailId not in '':
-                                            if VendorsName not in '' and VendorsPhone not in '' and VendorsAddress not in '' and VendorsMailId not in '':
-                                                try:
-                                                    sql = "INSERT INTO vendors(Vendors_Name,Vendors_Phone,Vendors_Address,Vendors_Mail_Id,Is_Active)VALUES(%s, %s,%s, %s,1)"
-                                                    val = (VendorsName,VendorsPhone,VendorsAddress,VendorsMailId)
-                                                    sql_engine.execute(sql, val)
-                                                    print("Success. A record has been inserted.")
-                                                    PurchaseModule().Statement()
-                                                except :
-                                                    print("Failed inserting record into python_users table ")
-
-                                            else :
-                                                print('')
-=======
                                                                             
                                         if VendorsMailId in '' :                                            
                                             print('The Vendor Mail Id is Empty. So Please Enter it.')            
@@ -100,7 +74,6 @@ class PurchaseModule:
 
                                 else:
                                     print('')
->>>>>>> e5d25a57c34145c2ee92596ddc2430cdcc4b6c77
 
         except:
             print('Inputs must not be blank...')
@@ -149,16 +122,10 @@ class PurchaseModule:
                                         a=1
 
                                     elif VendorsAddress not in '':
-<<<<<<< HEAD
-                                        VendorsPhone=input('Enter The Contact Of The Vendor that You want to Edit :')
-                                        b=1
-                                        while b==1:
-=======
                                         b=1
                                         while b==1:
                                             VendorsPhone=input('Enter The Contact Of The Vendor that You want to Edit :')
                                                                                     
->>>>>>> e5d25a57c34145c2ee92596ddc2430cdcc4b6c77
                                             if VendorsPhone in '':
                                                 print('The Vendor Phone is blank. So Enter a Value')    
                                                 b=1
@@ -174,11 +141,8 @@ class PurchaseModule:
                                                         PurchaseModule().Statement()
                                                     except:
                                                         print('Failed Updating record into Vendors table...')
-<<<<<<< HEAD
-=======
                                                 else:
                                                     print('')
->>>>>>> e5d25a57c34145c2ee92596ddc2430cdcc4b6c77
 
                                     else:
                                         print('Invalid Mail Input...')
@@ -216,35 +180,6 @@ class PurchaseModule:
                         print(result)
                         #df = pd.DataFrame(result, columns = ['Vendors_Id'])
 
-<<<<<<< HEAD
-                        df = pd.DataFrame(result, columns = ['Vendors_Id'])
-                        print(df['Vendors_Id'][0])
-                        POVendorsId=int(df['Vendors_Id'][0])
-                        print('aa',POVendorsId)         
-
-                        if len(df.index) =='[]':
-                            print('No such ID exists...')
-                            i=1
-                        # elif len(result) != '':
-                        elif len(df.index)!='[]':
-                            PORequestId=int(df['Vendors_Id'])
-                            print(PORequestId)
-
-                            try:
-                                if( VendorID.isdigit()):
-
-                                    #s=1
-                                    #while s==1:
-                                    print("User input is Number ")
-                                    Vendor_Delete_Query= 'UPDATE vendors SET Is_Active = %s WHERE Vendors_Id = ''"'+str(VendorID)+'"'
-                                    values = (VendorsActive)
-                                    sql_engine.execute(Vendor_Delete_Query, values)
-                                    print("Success. A record has been deleted.")
-                                    PurchaseModule().Statement()
-                                else: 
-                                    print("User input is string ")
-                                    s=1
-=======
                         #POVendorsId=int(df['Vendors_Id'][0])
                         
                         #if len(df.index) =='[]':
@@ -265,7 +200,6 @@ class PurchaseModule:
                             else: 
                                 print("User input is string ")
                                 #s=1
->>>>>>> e5d25a57c34145c2ee92596ddc2430cdcc4b6c77
                                 
                         except :
                             print("Failed Deleting record into Vendors table... Check Your Input... ") 
@@ -678,5 +612,4 @@ class PurchaseModule:
             print('Check Your Input..!')           
             return
 
-PurchaseModule().Statement() 
 
