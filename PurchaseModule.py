@@ -323,9 +323,8 @@ class PurchaseModule:
                                         try:
                                             Request_Status=5
                                             RequestStatus_str=str(Request_Status)
-                                            Currentdate=pd.to_datetime('now')
-                                            requestStatus='Update po_request SET status_id=%s , deleted_date=%s WHERE po_request_id=''"'+str(po_request_id)+'"'
-                                            values=(RequestStatus_str,Currentdate)
+                                            requestStatus='Update po_request SET status_id=%s WHERE po_request_id=''"'+str(po_request_id)+'"'
+                                            values=(RequestStatus_str)
                                             sql_engine.execute(requestStatus,values)
                                             print('purchase Request Status Has been Updated...')
                                             PurchaseModule().Statement()
