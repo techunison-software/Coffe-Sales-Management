@@ -12,6 +12,177 @@ class PurchaseModule:
 
             # Statement()
 
+    def ShowItem(self,VendorID):
+        ItemQuery='SELECT vi.Vendors_Id,ii.inv_item_id,ii.item_name from vendors_item vi join inv_item ii on vi.inv_item_id=ii.inv_item_id Where vi.Vendors_Id=''"'+str(VendorID)+'"'
+        result=pd.read_sql_query(ItemQuery,sql_engine)
+        print(result)
+        return result
+
+
+    def AddItem(self) :
+        msg='d'
+        try:
+            a=1
+            while a==1:
+                Item_VendorsID=input('Enter The Vendors ID For Which You Want To Add Item :')
+                if Item_VendorsID in '':
+                    print('Vendor Input for which you want to add an Item is blank. So enter it...')
+                    a=1
+
+                elif Item_VendorsID not in '' and Item_VendorsID.isdigit():
+                    b=1
+                    while b==1:
+                        Item=input('Enter The Item Id for which you want to add to a vendor ...:')
+                        
+                        if Item in '':
+                            print('Item ID cannot be blank...')
+                            b=1                            
+                        elif Item not in '' and Item.isdigit():
+                            print('Fine.............')
+                            ItemQuery='SELECT count(*) as ID from vendors_item vi join inv_item ii on vi.inv_item_id=ii.inv_item_id Where vi.Is_Active = 1 AND vi.Vendors_Id=''"'+str(Item_VendorsID)+'"'
+                            result=pd.read_sql_query(ItemQuery,sql_engine)
+                            print(result)
+                            df = pd.DataFrame(result, columns = ['ID'])
+                            
+                            ID_result=int(df['ID'][0])
+                                                        
+                            Currentdate=pd.to_datetime('now')
+                                                        
+                            if ID_result > 0:
+                                print(Currentdate)
+                                InsertItemQuery="INSERT INTO vendors_item(inv_item_id,created_on,vendors_id,created_by,Is_Active)VALUES(%s,%s,%s, 1,1)"
+                                val = (Item,str(Currentdate),Item_VendorsID)
+                                print(InsertItemQuery)
+                                sql_engine.execute(InsertItemQuery, val)
+                                print('b')
+                                print("Success. A record has been inserted.")
+
+                            elif ID_result < 0:
+                                print('The Input must be a number or Inventory ID must not exist in the table...')
+                                b=1
+
+                            else:
+                                print('Something went wrong... Do check...')
+
+                        else:
+                            print('aasddsds')
+
+                else:
+                    print('Check Your Input')
+                    a=1
+
+        except:
+            print('An exception prevented the application from running...')
+            return msg
+
+
+    def EditItem(self,VendorID) :
+        Msg='green'
+        i=3
+        while i==3:
+            ItemID=input('Enter the Item You want to edit...:')
+            if ItemID in '':
+                print('The Item ID is blank. So enter a value.')
+                i=3
+
+            elif ItemID not in '' and ItemID.isdigit():
+                
+                #s=0
+                #while s==0:
+                try:                   
+                    Exists_invQuery='SELECT Count(pop.vendors_item_id) as ID FROM po_purchase pop JOIN vendors_item vi ON vi.inv_item_id = pop.vendors_item_id Where Purchase_Status = 0 AND inv_item_id=''"'+str(ItemID)+'"'
+                    result=pd.read_sql_query(Exists_invQuery,sql_engine)
+                    print(result)
+                    df = pd.DataFrame(result, columns = ['ID'])
+                    
+
+                    ID_result=int(df['ID'][0])
+                    
+                    if ID_result > 0:
+                        invitemID=input('Enter the Inv_Item Id you want to edit...:')
+                        
+
+                        #a=1
+                        #while a==1:
+                        if invitemID in '':
+                            print('Please Enter Inv_item_id as it is blank...')
+                            a=1
+                        elif invitemID not in '' and invitemID.isdigit():
+                            print('First')
+                            Currentdate=pd.to_datetime('now')
+                            User=1  #self.user
+                            Inv_Update_Query= 'UPDATE vendors_item SET inv_item_id = %s,updated_on = %s,updated_by=%s WHERE Vendors_Id = ''"'+str(VendorID)+'"'
+                            print('a')
+                            values = (invitemID,Currentdate,User)
+                            print('b')
+                            sql_engine.execute(Inv_Update_Query, values)
+                            print('c')
+                            print("Success. A record has been updated.")
+                        else:
+                            print('Enter input in correct format...')
+
+                    elif ID_result < 0:
+                        print('The update process cannot proceed further as the Inv Item ID is already present...')
+                        #s=0
+
+                    elif ID_result in '0':
+                        print('No Isuch ID found... Check') 
+                        #s=0
+                except:
+                    print('SOmething prevented the application from running... ')
+                        
+
+            else:
+                print('Check Your Input...')
+                return Msg
+
+
+
+    def DeleteItem(self,VendorID) :
+        ItemActive=0
+        i=1
+        while i==1:
+            Item_ID=input('Enter the Item ID you want to delete...:')
+
+            if Item_ID is '':
+                print('Item ID cannot be empty...')
+                i=1
+
+            elif Item_ID not in '' and Item_ID.isdigit():
+                CheckIDExists='SELECT Count(Vendors_item_Id) as ID FROM vendors_item WHERE Is_Active =1 and Vendors_item_Id=''"'+str(VendorID)+'"'
+                result = pd.read_sql_query(CheckIDExists,sql_engine)
+
+                print(result)
+                df = pd.DataFrame(result, columns = ['ID'])
+                ID_result=int(df['ID'][0])
+
+                if ID_result > 0:
+                    try:
+                        if( VendorID.isdigit()):                                    
+                            Vendor_Delete_Query= 'UPDATE vendors_item SET Is_Active = %s WHERE Vendors_item_id = ''"'+str(VendorID)+'"'
+                            values = (ItemActive)
+                            sql_engine.execute(Vendor_Delete_Query, values)
+                            print("Success. A record has been deleted.")
+                            PurchaseModule().Statement()
+                        else: 
+                            print("User input is string ")
+                                                            
+                    except :
+                        print("Failed Deleting record into Vendors table... Check Your Input... ")
+
+                elif ID_result < 0:
+                    print('Not found...') 
+                    i=1
+
+                else:
+                    print('Check your input...')
+            else:
+                print('')
+                return
+
+
+                        
+
 
     def ShowVendor(self):
         query = 'SELECT Vendors_Id, Vendors_Name FROM vendors WHERE Is_Active=1'
@@ -529,7 +700,7 @@ class PurchaseModule:
         #print(self.user)
         #print(self.user[0]["role_id"])
         try:
-            answer = input('Please Select One Of The Values 1. Vendor 2. Purchase or type Q to quit:')
+            answer = input('Please Select One Of The Values 1. Vendor 2. Purchase 3. Items or type Q to quit:')
             i=0
             while i==0:
                 if answer in '':
@@ -584,23 +755,98 @@ class PurchaseModule:
 
                         prompt="Select any one of the operations to process Purchase x. Add Purchase y. Edit Purchase z. Delete Purchase : " if self.user[0]["role_id"]!=3 else "Select any one of the operations to process Purchase x. Add Purchase y. Edit Purchase :"
                         response = input(prompt)
-                        
+                                                
                         if response in '':
                             print('User has not entered any Input. Please Choose A Menu.')
-                        elif response in 'x':
+                        elif response in 'x' or response in 'X':
                             PurchaseModule().CreatePurchaseList()                            
 
-                        elif response in 'y':
+                        elif response in 'y'  or response in 'Y':
                             print('You Have Selected To Edit A Purchase ')
                             PurchaseModule().EditPurchase()
 
-                        elif response in'z' and self.user[0]["role_id"]!=3:
+                        elif response in'z' or response in 'Z' and self.user[0]["role_id"]!=3:
                             print('You Have Selected To Delete A Purchase ')    
                             PurchaseModule().DeletePurchase()
 
                         else:
                             print('Check Credentials and Input...')
                             a=4
+
+
+                elif answer in '3':
+                    z=1
+                    while z==1:
+                        print(answer,'Adding Items From Vendors')  
+                        
+                        prompt="Select any one of the operations to process ITEMS l. Add Items m. Edit Items n. Delete Items : " if self.user[0]["role_id"]!=3 else "Select any one of the operations to process Purchase l. Add Items m. Edit Items :"
+                        response = input(prompt)
+
+                        if response in '':
+                            print('User Has Not Entered ANy Input. Please Choose One...')
+                        elif response in 'l' or response in 'L':
+                            print('You Have Selected To Add an Item...')
+                            s=1
+                            while s==1:
+                                VendorID=input('Enter The Vendor ID You want to check...')
+                                PurchaseModule().ShowItem(VendorID)
+                                i=1
+                                while i==1:
+                                    if VendorID in '':
+                                        print('Vendor ID must not be blank...')
+                                        i=1
+
+                                    elif VendorID not in '' :
+                                        PurchaseModule().ShowItem(VendorID)
+                                        PurchaseModule().AddItem() 
+
+                                    else:
+                                        print('Invalid Input')
+                                        s=1
+
+
+                        elif response in 'm' or response in 'M':
+                            h=1
+                            while h==1:
+                                print('You Have Selected To Edit an Item...')
+                                VendorID=input('Enter The Vendor ID You want to check...')
+                                g=1
+                                while g==1:
+                                    if VendorID in '':
+                                        print('vendor ID must not be blank...')
+                                        g=1
+
+                                    elif VendorID not in '' :
+                                        PurchaseModule().ShowItem(VendorID)                            
+                                        PurchaseModule().EditItem(VendorID) 
+
+                                    else :
+                                        print('Invalid Data...')
+                                        h=1
+
+
+                        elif response in 'n' or response in 'N':
+                            o=1
+                            while o==1:
+                                print('You have selected to delete an Item...')
+                                VendorID=input('Enter The Vendor ID you want to delete...:')
+
+                                s=1
+                                while s==1:
+                                    if VendorID in '':
+                                        print('vendor ID must not be blank...')
+                                        s=1
+                                    elif VendorID not in '':
+                                        PurchaseModule().DeleteItem(VendorID) 
+                                    else :
+                                        print('Invalid Entry...')
+                                        o=1
+
+                        else :
+                            print('Check Credentials and Input...')
+                            z=3 
+
+
 
                 elif answer in 'Q' or answer in 'q':
                     print('Exiting...')
@@ -612,3 +858,4 @@ class PurchaseModule:
             return
 
 
+PurchaseModule().Statement()
